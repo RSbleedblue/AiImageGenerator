@@ -1,8 +1,9 @@
+import axios from 'axios';
 import { useState, useEffect } from 'react';
 import ClipLoader from "react-spinners/ClipLoader";
 
 const HeroSection = () => {
-    const [image, setImage] = useState("");
+    const [image, setImage] = useState(null);
     const [prompt, setPrompt] = useState("");
     const [generate, setGenerate] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -15,19 +16,18 @@ const HeroSection = () => {
         const fetchData = async () => {
             try {
                 setLoading(true); 
-                const response = await fetch(
+                const response = await axios.post(
                     "https://api-inference.huggingface.co/models/prompthero/openjourney-v4",
+                    { inputs: prompt },
                     {
                         headers: {
                             Authorization: "Bearer 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",
                             'Content-Type': 'application/json'
                         },
-                        method: "POST",
-                        body: JSON.stringify({ inputs: prompt }),
+                        responseType: 'blob' 
                     }
                 );
-                const result = await response.blob();
-                const imageObjectURL = URL.createObjectURL(result);
+                const imageObjectURL = URL.createObjectURL(response.data);
                 setImage(imageObjectURL);
             } catch (error) {
                 console.error("Error fetching data: ", error);
